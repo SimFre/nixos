@@ -8,16 +8,18 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports = [
-   ../../common/common.nix
-  ];
+  #imports = [
+  # ../../common/common.nix
+  #];
   environment = {
     systemPackages = with pkgs; [
+      neofetch
+      wslu
     ];
   };
   users = {
     users = {
-      basn = {
+      simfre = {
         shell = pkgs.zsh;
       };
       root = {
@@ -26,8 +28,8 @@
     };
   };
   wsl = {
-    enable = true;
-    defaultUser = "basn";
+    #enable = true;
+    defaultUser = "nixos";
   };
   system.stateVersion = "24.11"; # Did you read the comment?
 }

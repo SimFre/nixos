@@ -1,1 +1,0 @@
-machines/bigtop/configuration.nix

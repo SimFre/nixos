@@ -2,7 +2,7 @@
 {
   users  = {
     users = {
-      laban = {
+      simfre = {
         isNormalUser = true;
 	description = "Simon Fredriksson";
         extraGroups = [ "wheel" "networkmanager" ];

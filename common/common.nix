@@ -89,14 +89,14 @@
       fuzzyCompletion = true;
       #enableZshIntegration = true;
     };
-    nh = {
-      enable = true;
-      clean = {
-        enable = true;
-        extraArgs = "--keep-since 4d --keep 3";
-      };
-      flake = "/home/laban/nixos";
-    };
+    #nh = {
+    #  enable = true;
+    #  clean = {
+    #    enable = true;
+    #    extraArgs = "--keep-since 4d --keep 3";
+    #  };
+    #  flake = "/home/simfre/nixos";
+    #};
     #git = {
     #  enable = true;
     #  userName = "Simon Fredriksson";
