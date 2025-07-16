@@ -10,8 +10,17 @@
       ghostty
       kitty
       keepassxc
+      libreoffice-fresh
+      vscode.fhs
+      nixfmt-rfc-style
+
     ];
   };
+
+  powerManagement = {
+    enable = true;
+  };
+
   fonts.packages = with pkgs; [
     meslo-lgs-nf
   ];
@@ -36,5 +45,19 @@
       };
     };
   };
+
+  programs = {
+    xwayland.enable = true;
+    direnv.enable = true;
+  };
+
+  # GNOME
+  # services.xserver.displayManager.gdm.enable = true;
+  # services.xserver.desktopManager.gnome.enable = true;
+
+  # DEEPIN
+  # services.xserver.displayManager.lightdm.enable = true;
+  # services.xserver.desktopManager.deepin.enable = true;
+
 
 }

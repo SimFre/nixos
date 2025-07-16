@@ -12,7 +12,7 @@
       };
       
       laban = {
-        hashedPassword = "$6$RIM/z/tXnTu0QRWw$hcvyMXjJR/yrpNNmciGG185We5QORraNa8W8O68Yx8HWqDTTrz106R0NZkKPY58e/gNSRaxe2N69McelsI9G1.";
+        hashedPassword = "$y$j9T$jmMv6ZMHjYgb5PQGTGpMC1$zRH291CADo7bpBU/QFKc054x2YI0G4HM.CsfqffmDL/";
         isNormalUser = true;
         description = "Simon Fredriksson";
         extraGroups = [ "wheel" "networkmanager" ];
@@ -26,9 +26,9 @@
       };
 
       simfre = {
-        hashedPassword = "$6$RIM/z/tXnTu0QRWw$hcvyMXjJR/yrpNNmciGG185We5QORraNa8W8O68Yx8HWqDTTrz106R0NZkKPY58e/gNSRaxe2N69McelsI9G1.";
+        hashedPassword = "$y$j9T$jmMv6ZMHjYgb5PQGTGpMC1$zRH291CADo7bpBU/QFKc054x2YI0G4HM.CsfqffmDL/";
         isNormalUser = true;
-	description = "Simon Fredriksson";
+	description = "SimFre";
         extraGroups = [ "wheel" "networkmanager" ];
         openssh = {
           authorizedKeys = {

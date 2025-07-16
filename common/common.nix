@@ -39,6 +39,7 @@
     systemPackages = with pkgs; [
       neovim
       wget
+      htop
       btop
       dysk
       unzip
@@ -56,6 +57,8 @@
       ipcalc
       nh
       dust
+      mc
+      pv
     ];
   };
   programs.ssh.startAgent = true;
@@ -113,6 +116,11 @@
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
     };
   };
   nixpkgs = {
