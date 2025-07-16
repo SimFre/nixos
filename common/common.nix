@@ -58,6 +58,7 @@
       dust
     ];
   };
+  programs.ssh.startAgent = true;
   programs = {
     mtr = {
       enable = true;
@@ -108,6 +109,7 @@
     #  useTheme = "blue-owl";
     #};
   };
+  services.openssh.enable = true;
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];

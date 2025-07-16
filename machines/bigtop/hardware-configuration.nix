@@ -29,6 +29,16 @@
       fsType = "zfs";
     };
 
+  fileSystems."/nix" =
+    { device = "npool/nix";
+      fsType = "zfs";
+    };
+
+  fileSystems."/var" =
+    { device = "npool/var";
+      fsType = "zfs";
+    };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
