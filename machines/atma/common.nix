@@ -1,41 +1,9 @@
 { pkgs, ... }:
 {
-  time = {
-    timeZone = "Europe/Stockholm";
-  };
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_ADDRESS = "en_DK.UTF-8";
-      LC_IDENTIFICATION = "en_DK.UTF-8";
-      LC_MEASUREMENT = "en_DK.UTF-8";
-      LC_MONETARY = "en_DK.UTF-8";
-      LC_NAME = "en_DK.UTF-8";
-      LC_NUMERIC = "en_DK.UTF-8";
-      LC_PAPER = "en_DK.UTF-8";
-      LC_TELEPHONE = "en_DK.UTF-8";
-      LC_TIME = "en_DK.UTF-8";
-    };
-  };
+
   console = {
     font = "Lat2-Terminus16";
     keyMap = "sv-latin1";
-  };
-  users  = {
-    defaultUserShell = pkgs.zsh;
-    users = {
-      laban = {
-        isNormalUser = true;
-        extraGroups = [ "wheel" ];
-        openssh = {
-          authorizedKeys = {
-            keys = [ 
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLo+YygGuShRdm6fsOJmESqwfMecX7Kr+zJFNMk6rZI SF20220901" 
-            ];
-          };
-        };
-      };
-    };
   };
   security = {
     sudo = {
@@ -68,7 +36,11 @@
       pv
     ];
   };
+  services.openssh.enable = true;
   programs = {
+    ssh {
+      startAgent = true;
+    };
     mtr = {
       enable = true;
     };
