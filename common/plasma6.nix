@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+
+  # PLASMA
   services = {
     desktopManager = {
       plasma6 = {
@@ -8,7 +10,8 @@
     };
     displayManager = {
       sddm = {
-        enable = true;
+      autoNumlock = true;
+      enable = true;
         wayland = {
           enable = true;
         };

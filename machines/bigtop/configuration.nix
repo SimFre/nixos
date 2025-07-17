@@ -1,17 +1,18 @@
-{ pkgs, ... }:
+{ config, lib, pkgs ? import <nixpkgs-unstable> {}, ... }:
 {
   imports =
     [ 
       ./hardware-configuration.nix
       ../../common/common.nix
       ../../common/desktop.nix
-      ./plasma6.nix
+      ../../common/plasma6.nix
     ];
 
   boot = {
     loader = {
       systemd-boot = {
         enable = true;
+        configurationLimit = 10;
       };
       efi = {
         canTouchEfiVariables = true;
@@ -26,6 +27,8 @@
     supportedFilesystems = [ "zfs" ];
     kernelPackages = pkgs.linuxPackages_zen;
   };
+  zramSwap.enable = true;
+
   networking = {
     hostName = "bigtop"; 
     hostId = "fee4a441";
@@ -40,4 +43,6 @@
   system = {
     stateVersion = "25.05";
   };
+
+
 }
