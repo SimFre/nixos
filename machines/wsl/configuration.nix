@@ -11,28 +11,18 @@
   imports = [
     # include NixOS-WSL modules
     <nixos-wsl/modules>
-  # ../../common/common.nix
+   ../../common/common.nix
   ];
   environment = {
     systemPackages = with pkgs; [
-      neofetch
-      neovim
       wslu
+      socat
     ];
-  };
-  users = {
-    users = {
-      simfre = {
-        #shell = pkgs.zsh;
-      };
-      root = {
-        #shell = pkgs.zsh;
-      };
-    };
   };
   wsl = {
     enable = true;
     defaultUser = "simfre";
   };
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "24.11";
+
 }
