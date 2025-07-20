@@ -1,12 +1,17 @@
 { pkgs, ... }:
 {
   #imports = [ ./users.nix ./stylix.nix ];
-  imports = [ ./users.nix ];  
+  imports = [ ./users.nix ];
   time = {
     timeZone = "Europe/Stockholm";
   };
   networking = {
-    timeServers = [ "sth1.ntp.se" "sth2.ntp.se" "gbg1.ntp.se" "gbg2.ntp.se" ];
+    timeServers = [
+      "sth1.ntp.se"
+      "sth2.ntp.se"
+      "gbg1.ntp.se"
+      "gbg2.ntp.se"
+    ];
   };
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -27,7 +32,7 @@
     font = "Lat2-Terminus16";
     keyMap = "sv-latin1";
   };
-  users  = {
+  users = {
     defaultUserShell = pkgs.zsh;
   };
   security = {
@@ -59,6 +64,8 @@
       dust
       mc
       pv
+      lm_sensors
+      glances
     ];
   };
   programs.ssh.startAgent = true;
@@ -115,7 +122,10 @@
   services.openssh.enable = true;
   nix = {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
     gc = {
       automatic = true;
