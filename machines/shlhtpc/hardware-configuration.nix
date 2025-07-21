@@ -19,7 +19,7 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/0950-42A7";
+    { device = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW256HEHP-000L7_S35ENA1J835204-part1";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
@@ -40,8 +40,7 @@
     };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/0950-33F9"; }
-    ];
+    [ { device = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW256HEHP-000L7_S35ENA1J835204-part2"; } ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
@@ -53,3 +52,5 @@
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
+
+
