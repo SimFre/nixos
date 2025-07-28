@@ -60,30 +60,41 @@
 
   # User configuration
   users.users.htpc = {
+    description = "HTPC";
     isNormalUser = true;
     extraGroups = [ "video" "audio" "input" "networkmanager" ];
-    isAutoLogin = true;
   };
 
   # Enable Kodi
-  services.kodi.enable = true;
-  services.kodi.pvrIptvSimple.enable = true;
-  services.kodi.plugins = [
-    "plugin.video.netflix"
-    "plugin.video.svtplay"
-    "plugin.video.youtube"
-    "plugin.video.jellycon"
-    "plugin.video.pvr.iptvsimple"
-  ];
+  #services.kodi.enable = true;
+  #services.kodi.pvrIptvSimple.enable = true;
+  #services.kodi.plugins = [
+  #  "plugin.video.netflix"
+  #  "plugin.video.svtplay"
+  #  "plugin.video.youtube"
+  #  "plugin.video.jellycon"
+  #  "plugin.video.pvr.iptvsimple"
+  #];
 
   # Install kodi-cli
+  nixpkgs.config.allowBroken = true;
   environment.systemPackages = with pkgs; [
     kodi-cli
+	(kodi.withPackages (kodiPkgs: with kodiPkgs; [
+		jellycon
+		pvr-iptvsimple
+		netflix
+		svtplay
+		youtube
+	]))
   ];
 
   # Autostart Kodi
   services.xserver.enable = true;
   services.xserver.displayManager.startx.enable = true;
+  services.xserver.desktopManager.kodi.enable = true;
+  services.xserver.displayManager.lightdm.greeter.enable = false;
+  services.displayManager.autoLogin.user = "htpc";
   systemd.user.services.kodi = {
     description = "Kodi Media Center";
     wantedBy = [ "default.target" ];
@@ -93,28 +104,33 @@
     };
   };
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "python3.12-youtube-dl-2021.12.17"
+  ];
+
+
   # Enable VNC for visual remote control. A random password
   # is generated on first boot and stored in a file.
   # View it with `cat /var/lib/vnc/vnc-password.txt`
-  services.xserver.vnc.enable = true;
-  services.xserver.vnc.port = 5900;
-  services.xserver.vnc.password = randomPassword; # Use the same random password for VNC
-  services.xserver.vnc.passwordFile = "/var/lib/vnc/vnc-password.txt";
-  systemd.services.generate-vnc-password = {
-    description = "Generate VNC password if missing";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = ''
-        if [ ! -f /var/lib/vnc/vnc-password.txt ]; then
-          pw=$(head -c 12 /dev/urandom | base64)
-          mkdir -p /var/lib/vnc
-          echo "$pw" > /var/lib/vnc/vnc-password.txt
-          chmod 600 /var/lib/vnc/vnc-password.txt
-        fi
-      '';
-    };
-  };
+  services.xrdp.enable = true;
+  #services.xserver.vnc.enable = true;
+  #services.xserver.vnc.port = 5900;
+  #services.xserver.vnc.passwordFile = "/var/lib/vnc/vnc-password.txt";
+  #systemd.services.generate-vnc-password = {
+  #  description = "Generate VNC password if missing";
+  #  wantedBy = [ "multi-user.target" ];
+  #  serviceConfig = {
+  #    Type = "oneshot";
+  #    ExecStart = ''
+  #      if [ ! -f /var/lib/vnc/vnc-password.txt ]; then
+  #        pw=$(head -c 12 /dev/urandom | base64)
+  #        mkdir -p /var/lib/vnc
+  #        echo "$pw" > /var/lib/vnc/vnc-password.txt
+  #        chmod 600 /var/lib/vnc/vnc-password.txt
+  #      fi
+  #    '';
+  #  };
+  #};
 
   # Enable Bluetooth manager
   services.blueman.enable = true;
@@ -146,7 +162,7 @@
           "--network=host"
           #"--device=/dev/ttyACM0:/dev/ttyACM0"  # Example, change this to match your own hardware
         ];
-        restart = "always";
+        # restart = "always";
       };
     };
   };
