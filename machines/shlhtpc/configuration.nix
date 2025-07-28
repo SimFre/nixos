@@ -53,21 +53,71 @@
       enable = true;
       authKeyParameters.baseURL = "https://vpn.lan2k.org/";
       extraSetFlags = [
-
+        "--accept-dns=false"
       ];
     };
   };
 
-  services.xserver.enable = true;
-  services.xserver.desktopManager.kodi.enable = true;
-  services.displayManager.autoLogin.user = "htpc";
-  services.xserver.displayManager.lightdm.greeter.enable = false;
-  users.extraUsers.htpc = {}.isNormalUser = true;
+  # User configuration
+  users.users.htpc = {
+    isNormalUser = true;
+    extraGroups = [ "video" "audio" "input" "networkmanager" ];
+    isAutoLogin = true;
+  };
 
-  # Define a user account
-  services.cage.user = "htpc";
-  services.cage.program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
-  services.cage.enable = true;
+  # Enable Kodi
+  services.kodi.enable = true;
+  services.kodi.pvrIptvSimple.enable = true;
+  services.kodi.plugins = [
+    "plugin.video.netflix"
+    "plugin.video.svtplay"
+    "plugin.video.youtube"
+    "plugin.video.jellycon"
+    "plugin.video.pvr.iptvsimple"
+  ];
+
+  # Install kodi-cli
+  environment.systemPackages = with pkgs; [
+    kodi-cli
+  ];
+
+  # Autostart Kodi
+  services.xserver.enable = true;
+  services.xserver.displayManager.startx.enable = true;
+  systemd.user.services.kodi = {
+    description = "Kodi Media Center";
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.kodi}/bin/kodi";
+      Restart = "always";
+    };
+  };
+
+  # Enable VNC for visual remote control. A random password
+  # is generated on first boot and stored in a file.
+  # View it with `cat /var/lib/vnc/vnc-password.txt`
+  services.xserver.vnc.enable = true;
+  services.xserver.vnc.port = 5900;
+  services.xserver.vnc.password = randomPassword; # Use the same random password for VNC
+  services.xserver.vnc.passwordFile = "/var/lib/vnc/vnc-password.txt";
+  systemd.services.generate-vnc-password = {
+    description = "Generate VNC password if missing";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = ''
+        if [ ! -f /var/lib/vnc/vnc-password.txt ]; then
+          pw=$(head -c 12 /dev/urandom | base64)
+          mkdir -p /var/lib/vnc
+          echo "$pw" > /var/lib/vnc/vnc-password.txt
+          chmod 600 /var/lib/vnc/vnc-password.txt
+        fi
+      '';
+    };
+  };
+
+  # Enable Bluetooth manager
+  services.blueman.enable = true;
 
   # For Home Manager
   # home.file.widevine-lib.source = "${pkgs.unfree.widevine-cdm}/share/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so";
@@ -89,13 +139,14 @@
     oci-containers = {
       backend = "podman";
       containers.homeassistant = {
-        volumes = [ "home-assistant:/config" ];
-        environment.TZ = "Europe/Stockholm";
+        volumes = [ "/var/lib/hass:/config" ];
+        environment.TZ = config.time.timeZone;
         image = "ghcr.io/home-assistant/home-assistant:stable"; # Warning: if the tag does not change, the image will not be updated
         extraOptions = [ 
           "--network=host"
-          "--device=/dev/ttyACM0:/dev/ttyACM0"  # Example, change this to match your own hardware
+          #"--device=/dev/ttyACM0:/dev/ttyACM0"  # Example, change this to match your own hardware
         ];
+        restart = "always";
       };
     };
   };
