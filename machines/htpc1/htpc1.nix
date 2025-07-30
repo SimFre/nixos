@@ -99,7 +99,6 @@
   # Enable WiFi and configure it to connect to the predefined network
   networking.firewall.enable = false;
   #networking.wireless.enable = true;
-  #networking.wireless.networks."Tleilaxu" = { psk = "nonova2006"; };
 
   # Install required software
   environment.systemPackages = with pkgs; [

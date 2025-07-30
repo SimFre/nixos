@@ -86,6 +86,9 @@ in
   # Install kodi-cli
   nixpkgs.config.allowBroken = true;
   environment.systemPackages = with pkgs; [
+    jitsi-meet-electron
+    rustdesk
+    jellyfin-media-player
     kodi-cli
     kodi-with-addons
     (python3.withPackages (ps: with ps; [ pillow ]))
@@ -157,6 +160,7 @@ in
   services.cage.program = "${kodi-with-addons}/bin/kodi-standalone";
   services.cage.enable = true;
 
+  # Unmute HDMI audio at startup
   systemd.services.unmute-hdmi = {
     enable = true;
     description = "Unmute HDMI audio at startup";
@@ -172,6 +176,20 @@ in
     };
   };
 
+  # Generate SSH keypair for HTPC on first boot using ECDSA
+  systemd.services.generate-ssh-key = {
+    enable = true;
+    script = ''
+      if [ ! -f /home/htpc/.ssh/id_ecdsa ]; then
+        mkdir -p /home/htpc/.ssh
+        ssh-keygen -t ecdsa -N "" -f /home/htpc/.ssh/id_ecdsa
+        chown -R htpc:users /home/htpc/.ssh
+        chmod 700 /home/htpc/.ssh
+      fi
+    '';
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+  };
 
   virtualisation = {
     containers.enable = true;
