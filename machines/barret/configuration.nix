@@ -93,7 +93,7 @@
 
   #security.acme = {
   #  acceptTerms = true;
-  #  defaults.email = "simon@palidor.se";
+  #  defaults.email = "noreply@lan2k.org";
   #  certs."uptime.lan2k.org" = {
   #    group = "nginx";
   #    listenHTTP = "0.0.0.0:80";

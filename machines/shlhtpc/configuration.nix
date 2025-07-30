@@ -6,8 +6,14 @@
 }:
 let
   kodi-with-addons = pkgs.kodi-wayland.withPackages (kodiPkgs: with kodiPkgs; [
+  #kodi-with-addons = pkgs.kodi-gbm.withPackages (kodiPkgs: with kodiPkgs; [
     inputstream-adaptive
     bluetooth-manager
+    jellycon
+    pvr-iptvsimple
+    netflix
+    svtplay
+    youtube
   ]);
 in
 {
@@ -70,6 +76,7 @@ in
     description = "HTPC";
     isNormalUser = true;
     extraGroups = [ "video" "audio" "input" "networkmanager" ];
+    linger = true;
   };
 
   # Enable Kodi
@@ -91,6 +98,8 @@ in
     jellyfin-media-player
     kodi-cli
     kodi-with-addons
+    alsa-utils
+    pavucontrol
     (python3.withPackages (ps: with ps; [ pillow ]))
 	#(kodi.withPackages (kodiPkgs: with kodiPkgs; [
 	#	jellycon
@@ -216,4 +225,44 @@ in
       };
     };
   };
+
+  #home = {
+  #  username = "htpc";
+  #  homeDirectory = "/home/htpc";
+  #  stateVersion = "25.05";
+  #};
+
+  # Kodi GBM service
+  #systemd.user.enable = true;
+  #systemd.user.services.kodi = {
+  #  Unit.Description = "Kodi media center";
+  #  Install = {
+  #    WantedBy = ["default.target"];
+  #  };
+  #  Service = {
+  #    Type = "simple";
+  #    ExecStart = "${kodi-with-addons}/bin/kodi-standalone";
+  #    Restart = "always";
+  #    TimeoutStopSec = "15s";
+  #    TimeoutStopFailureMode = "kill";
+  #  };
+  #};
+
+  #programs.kodi = {
+  #  enable = true;
+  #  package = kodi-with-addons;
+  #  # addonSettings = {};
+  #  settings = {
+  #    services = {
+  #      devicename = "viewscreen";
+  #      esallinterfaces = "true";
+  #      webserver = "true";
+  #      webserverport = "8080";
+  #      webserverauthentication = "false";
+  #      zeroconf = "true";
+  #    };
+  #  };
+  #};
+
+  #programs.home-manager.enable = true;
 }
