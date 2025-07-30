@@ -66,6 +66,9 @@
       pv
       lm_sensors
       glances
+      usbutils
+      jq
+      systemctl-tui
     ];
   };
   programs.ssh.startAgent = true;
