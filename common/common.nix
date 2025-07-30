@@ -42,33 +42,53 @@
   };
   environment = {
     systemPackages = with pkgs; [
+      # Utilities
+      fzf-zsh
+      git
+      jq
+      killall
+      lsof
+      mc
+      mkpasswd
+      neofetch
       neovim
-      wget
-      htop
-      btop
-      dysk
-      unzip
+      nh
+      oh-my-posh
+      pv
       screen
-      nmap
+      sops
+      unrar
+      unzip
+      zip
       zsh
+      zsh-fzf-history-search
       zsh-fzf-tab
       zsh-powerlevel10k
-      zsh-fzf-history-search
-      fzf-zsh
-      oh-my-posh
-      neofetch
-      sops
-      git
-      ipcalc
-      nh
+
+      # System monitoring
+      btop
       dust
-      mc
-      pv
-      lm_sensors
+      dysk
       glances
-      usbutils
-      jq
+      htop
+      lm_sensors
       systemctl-tui
+      
+      # Hardware tools
+      dmidecode
+      lshw
+      pciutils
+      smartmontools
+      usbutils
+
+      # Network tools
+      dnsutils
+      ipcalc
+      nmap
+      rsync
+      traceroute
+      wget
+      whois 
     ];
   };
   programs.ssh.startAgent = true;
