@@ -4,6 +4,12 @@
   pkgs ? import <nixpkgs-unstable> { },
   ...
 }:
+let
+  kodi-with-addons = pkgs.kodi-wayland.withPackages (kodiPkgs: with kodiPkgs; [
+    inputstream-adaptive
+    bluetooth-manager
+  ]);
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -36,6 +42,7 @@
   networking = {
     hostName = "shlhtpc";
     hostId = "eff2b131";
+    firewall.enable = false;
     networkmanager = {
       enable = true;
     };
@@ -80,29 +87,31 @@
   nixpkgs.config.allowBroken = true;
   environment.systemPackages = with pkgs; [
     kodi-cli
-	(kodi.withPackages (kodiPkgs: with kodiPkgs; [
-		jellycon
-		pvr-iptvsimple
-		netflix
-		svtplay
-		youtube
-	]))
+    kodi-with-addons
+    (python3.withPackages (ps: with ps; [ pillow ]))
+	#(kodi.withPackages (kodiPkgs: with kodiPkgs; [
+	#	jellycon
+	#	pvr-iptvsimple
+	#	netflix
+	#	svtplay
+	#	youtube
+	#]))
   ];
 
   # Autostart Kodi
-  services.xserver.enable = true;
-  services.xserver.displayManager.startx.enable = true;
-  services.xserver.desktopManager.kodi.enable = true;
-  services.xserver.displayManager.lightdm.greeter.enable = false;
-  services.displayManager.autoLogin.user = "htpc";
-  systemd.user.services.kodi = {
-    description = "Kodi Media Center";
-    wantedBy = [ "default.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.kodi}/bin/kodi";
-      Restart = "always";
-    };
-  };
+  #services.xserver.enable = true;
+  #services.xserver.displayManager.startx.enable = true;
+  #services.xserver.desktopManager.kodi.enable = true;
+  #services.xserver.displayManager.lightdm.greeter.enable = false;
+  #services.displayManager.autoLogin.user = "htpc";
+  #systemd.user.services.kodi = {
+  #  description = "Kodi Media Center";
+  #  wantedBy = [ "default.target" ];
+  #  serviceConfig = {
+  #    ExecStart = "${pkgs.kodi}/bin/kodi";
+  #    Restart = "always";
+  #  };
+  #};
 
   nixpkgs.config.permittedInsecurePackages = [
     "python3.12-youtube-dl-2021.12.17"
@@ -133,6 +142,8 @@
   #};
 
   # Enable Bluetooth manager
+  hardware.bluetooth.enable = true; 
+  hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
   # For Home Manager
@@ -140,6 +151,27 @@
   # home.file.widevine-lib.target = ".kodi/cdm/libwidevinecdm.so";
   # home.file.widevine-manifest.source = "${pkgs.unfree.widevine-cdm}/share/google/chrome/WidevineCdm/manifest.json";
   # home.file.widevine-manifest.target = ".kodi/cdm/manifest.json";
+
+  services.cage.user = "htpc";
+  services.cage.extraArguments = [ "-m" "last" ];
+  services.cage.program = "${kodi-with-addons}/bin/kodi-standalone";
+  services.cage.enable = true;
+
+  systemd.services.unmute-hdmi = {
+    enable = true;
+    description = "Unmute HDMI audio at startup";
+    wantedBy = [ "multi-user.target" ];
+
+    unitConfig = {
+      After = [ "sound.target" ];
+    };
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.runtimeShell} -c \"sleep 15 && ${pkgs.alsa-utils}/bin/amixer -c 0 set 'IEC958',0 unmute\"";
+    };
+  };
+
 
   virtualisation = {
     containers.enable = true;
