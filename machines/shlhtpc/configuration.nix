@@ -136,7 +136,7 @@ in
   # Home Assistant dashboard
   services.cage.user = "htpc";
   services.cage.extraArguments = [ "-m" "last" ];
-  services.cage.program = "${chromium}/bin/chromium --app=https://homeassistant.local:8123 --kiosk --no-first-run --disable-infobars --disable-translate --disable-pinch";
+  services.cage.program = "/run/current-system/sw/bin/chromium --app=http://localhost:8123 --kiosk --no-first-run --disable-infobars --disable-translate --disable-pinch";
   services.cage.enable = true;
 
   # services.xserver.enable = true;
