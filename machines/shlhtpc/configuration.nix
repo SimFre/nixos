@@ -13,12 +13,13 @@ let
     pvr-iptvsimple
     netflix
     svtplay
-    youtube
+    #youtube
   ]);
 in
 {
   imports = [
     ./hardware-configuration.nix
+    ./plymouth.nix
     ../../common/common.nix
     ../../common/desktop.nix
     #../../common/plasma6.nix
@@ -91,7 +92,7 @@ in
   #];
 
   # Install kodi-cli
-  nixpkgs.config.allowBroken = true;
+  #nixpkgs.config.allowBroken = true;
   environment.systemPackages = with pkgs; [
     jitsi-meet-electron
     rustdesk
@@ -101,6 +102,8 @@ in
     alsa-utils
     pavucontrol
     (python3.withPackages (ps: with ps; [ pillow ]))
+    chromium
+    unclutter
 	#(kodi.withPackages (kodiPkgs: with kodiPkgs; [
 	#	jellycon
 	#	pvr-iptvsimple
@@ -125,15 +128,36 @@ in
   #  };
   #};
 
-  nixpkgs.config.permittedInsecurePackages = [
-    "python3.12-youtube-dl-2021.12.17"
-  ];
+  #nixpkgs.config.permittedInsecurePackages = [
+  #  "python3.12-youtube-dl-2021.12.17"
+  #];
+
+
+  # Home Assistant dashboard
+  services.cage.user = "htpc";
+  services.cage.extraArguments = [ "-m" "last" ];
+  services.cage.program = "${chromium}/bin/chromium --app=https://homeassistant.local:8123 --kiosk --no-first-run --disable-infobars --disable-translate --disable-pinch";
+  services.cage.enable = true;
+
+  # services.xserver.enable = true;
+  # services.displayManager.autoLogin.enable = true;
+  # services.displayManager.autoLogin.user = "htpc";
+  # services.xserver.libinput.enable = true;
+  # services.xserver.libinput.mouse.disableWhileTyping = true;
+  # services.xserver.windowManager.openbox.enable = true;
+  # services.xserver.displayManager.sessionCommands = ''
+  #   xset s off
+  #   xset -dpms
+  #   xset s noblank
+  #   unclutter &
+  #     chromium --app=https://homeassistant.local:8123 --kiosk --no-first-run --disable-infobars --disable-translate --disable-pinch
+  # '';
 
 
   # Enable VNC for visual remote control. A random password
   # is generated on first boot and stored in a file.
   # View it with `cat /var/lib/vnc/vnc-password.txt`
-  services.xrdp.enable = true;
+  #services.xrdp.enable = true;
   #services.xserver.vnc.enable = true;
   #services.xserver.vnc.port = 5900;
   #services.xserver.vnc.passwordFile = "/var/lib/vnc/vnc-password.txt";
@@ -164,10 +188,10 @@ in
   # home.file.widevine-manifest.source = "${pkgs.unfree.widevine-cdm}/share/google/chrome/WidevineCdm/manifest.json";
   # home.file.widevine-manifest.target = ".kodi/cdm/manifest.json";
 
-  services.cage.user = "htpc";
-  services.cage.extraArguments = [ "-m" "last" ];
-  services.cage.program = "${kodi-with-addons}/bin/kodi-standalone";
-  services.cage.enable = true;
+  #services.cage.user = "htpc";
+  #services.cage.extraArguments = [ "-m" "last" ];
+  #services.cage.program = "${kodi-with-addons}/bin/kodi-standalone";
+  #services.cage.enable = true;
 
   # Unmute HDMI audio at startup
   systemd.services.unmute-hdmi = {
@@ -214,8 +238,15 @@ in
     oci-containers = {
       backend = "podman";
       containers.homeassistant = {
-        volumes = [ "/var/lib/hass:/config" ];
-        environment.TZ = config.time.timeZone;
+        volumes = [
+          "/var/lib/hass:/config"
+          "/var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket" # Mount DBus socket
+          "/etc/machine-id:/etc/machine-id" # Mount machine ID for DBus
+        ];
+        environment = {
+          TZ = config.time.timeZone;
+          DBUS_SYSTEM_BUS_ADDRESS = "unix:path=/var/run/dbus/system_bus_socket"; # Set DBus address
+        };
         image = "ghcr.io/home-assistant/home-assistant:stable"; # Warning: if the tag does not change, the image will not be updated
         extraOptions = [ 
           "--network=host"
