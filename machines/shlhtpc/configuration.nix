@@ -13,7 +13,7 @@ let
     pvr-iptvsimple
     netflix
     svtplay
-    #youtube
+    youtube
   ]);
 in
 {
@@ -94,14 +94,14 @@ in
   # Install kodi-cli
   #nixpkgs.config.allowBroken = true;
   environment.systemPackages = with pkgs; [
-    jitsi-meet-electron
-    rustdesk
-    jellyfin-media-player
-    kodi-cli
-    kodi-with-addons
+    #jitsi-meet-electron
+    #rustdesk
+    #jellyfin-media-player
+    #kodi-cli
+    #kodi-with-addons
     alsa-utils
     pavucontrol
-    (python3.withPackages (ps: with ps; [ pillow ]))
+    #(python3.withPackages (ps: with ps; [ pillow ]))
     chromium
     unclutter
 	#(kodi.withPackages (kodiPkgs: with kodiPkgs; [
