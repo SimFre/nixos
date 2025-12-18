@@ -5,7 +5,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./sops.nix
-      inputs.sops_nix.nixosModules.sops
+      #inputs.sops_nix.nixosModules.sops
       ../../common/common.nix
     ];
 

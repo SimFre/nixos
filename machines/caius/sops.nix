@@ -6,8 +6,13 @@
 }:
 
 {
+  imports = [
+    <sops-nix/modules/nix-os>  # or
+    # If using flakes:
+    # inputs.sops-nix.nixosModules.sops
+  ];
   sops = {
-    defaultSopsFile = ./sops.yaml;
+    defaultSopsFile = ./secrets.enc.yaml;
     age = {
       keyFile = "/root/.config/sops/age/keys.txt";
     };
