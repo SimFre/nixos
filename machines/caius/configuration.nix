@@ -1,11 +1,10 @@
 { config, lib, pkgs, ... }:
 
-{
+let secrets = import ./secrets.nix;
+in {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./sops.nix
-      #inputs.sops_nix.nixosModules.sops
       ../../common/common.nix
     ];
 
@@ -46,8 +45,8 @@
     ];
     script = ''
       set -eu
-      curl -4 "https://update.lan2k.org/?key=${config.sops.secrets."lan2kdns/key"}"
-      curl -6 "https://update.lan2k.org/?key=${config.sops.secrets."lan2kdns/key"}"
+      curl -4 "https://update.lan2k.org/?key=${secrets.lan2kdns_key}"
+      curl -6 "https://update.lan2k.org/?key=${secrets.lan2kdns_key}"
     '';
     serviceConfig = {
       Type = "oneshot";
@@ -129,7 +128,7 @@
             dataset = "arc2/caius";
             plan = "1w=>1d";
             host = "zfscaius@gau";
-            postsend = "/run/current-system/sw/bin/curl -s ${config.sops.secrets."znapzend/reporturl"}";
+            postsend = "/run/current-system/sw/bin/curl -s ${secrets.znapzend_reporturl}";
           };
         };
       };
