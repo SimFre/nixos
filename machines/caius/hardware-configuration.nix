@@ -27,7 +27,7 @@
       fsType = "vfat";
     };
 
-  swapDevices = [ { device = "/boot/swap"; } ];
+  swapDevices = [ { device = "/dev/sda2"; } ];
 
   # Set the Swedish keyboard layout for the console
   # console.keyMap = "se";

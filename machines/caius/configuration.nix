@@ -94,6 +94,7 @@ in {
 
   security.acme = {
     acceptTerms = true;
+    defaults.email = "noreply@example.com";
   };
 
   users.users.nginx.extraGroups = [ "acme" ];
