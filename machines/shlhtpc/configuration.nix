@@ -1,4 +1,5 @@
 { config, lib, pkgs, ... }:
+let secrets = import ./secrets.nix;
 #let
 #  kodi-with-addons = pkgs.kodi-wayland.withPackages (kodiPkgs: with kodiPkgs; [
 #  #kodi-with-addons = pkgs.kodi-gbm.withPackages (kodiPkgs: with kodiPkgs; [
@@ -10,7 +11,7 @@
 #    svtplay
 #    youtube
 #  ]);
-#in
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -51,6 +52,7 @@
   networking = {
     hostName = "shlhtpc";
     hostId = "eff2b131";
+    hosts = { "fd7a:115c:a1e0::4" = [ "gau" ]; };
     firewall.enable = false;
     networkmanager = {
       enable = true;
@@ -298,4 +300,28 @@
   #};
 
   #programs.home-manager.enable = true;
+
+  services.znapzend = {
+    enable = true;
+    autoCreation = true;
+    zetup = {
+      "npool" = {
+        enable = true;
+        recursive = true;
+        mbuffer.enable = false;
+        plan = "1d=>4h,1w=>1d";
+        timestampFormat = "%Y%m%d%H%M%SZ";
+        destinations = {
+          "gau" = {
+            dataset = "bigdata/backups/shlhtpc";
+            plan = "1w=>1d";
+            host = "zfsshlhtpc@gau";
+            postsend = "/run/current-system/sw/bin/curl -s ${secrets.znapzend_reporturl}";
+          };
+        };
+      };
+    };
+  };
+
+
 }
