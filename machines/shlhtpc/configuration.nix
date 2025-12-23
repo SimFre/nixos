@@ -1,21 +1,16 @@
-{
-  config,
-  lib,
-  pkgs ? import <nixpkgs-unstable> { },
-  ...
-}:
-let
-  kodi-with-addons = pkgs.kodi-wayland.withPackages (kodiPkgs: with kodiPkgs; [
-  #kodi-with-addons = pkgs.kodi-gbm.withPackages (kodiPkgs: with kodiPkgs; [
-    inputstream-adaptive
-    bluetooth-manager
-    jellycon
-    pvr-iptvsimple
-    netflix
-    svtplay
-    youtube
-  ]);
-in
+{ config, lib, pkgs, ... }:
+#let
+#  kodi-with-addons = pkgs.kodi-wayland.withPackages (kodiPkgs: with kodiPkgs; [
+#  #kodi-with-addons = pkgs.kodi-gbm.withPackages (kodiPkgs: with kodiPkgs; [
+#    inputstream-adaptive
+#    bluetooth-manager
+#    jellycon
+#    pvr-iptvsimple
+#    netflix
+#    svtplay
+#    youtube
+#  ]);
+#in
 {
   imports = [
     ./hardware-configuration.nix
@@ -24,6 +19,13 @@ in
     ../../common/desktop.nix
     #../../common/plasma6.nix
   ];
+
+  system.autoUpgrade = {
+    enable = true;
+    channel = "https://nixos.org/channels/nixos-25.05";
+    dates = "weekly";  # Specify update frequency
+    allowReboot = false;  # Set to true if you want automatic reboots
+  };
 
   boot = {
     loader = {
@@ -42,7 +44,7 @@ in
       supportedFilesystems = [ "zfs" ];
     };
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = pkgs.linuxPackages_zen;
+    #kernelPackages = pkgs.linuxPackages_lts;
   };
   zramSwap.enable = true;
 
@@ -93,25 +95,25 @@ in
 
   # Install kodi-cli
   #nixpkgs.config.allowBroken = true;
-  environment.systemPackages = with pkgs; [
-    #jitsi-meet-electron
-    #rustdesk
-    #jellyfin-media-player
-    #kodi-cli
-    #kodi-with-addons
-    alsa-utils
-    pavucontrol
-    #(python3.withPackages (ps: with ps; [ pillow ]))
-    chromium
-    unclutter
-	#(kodi.withPackages (kodiPkgs: with kodiPkgs; [
-	#	jellycon
-	#	pvr-iptvsimple
-	#	netflix
-	#	svtplay
-	#	youtube
-	#]))
-  ];
+  #environment.systemPackages = with pkgs; [
+  #  #jitsi-meet-electron
+  #  #rustdesk
+  #  #jellyfin-media-player
+  #  #kodi-cli
+  #  #kodi-with-addons
+  #  alsa-utils
+  #  pavucontrol
+  #  #(python3.withPackages (ps: with ps; [ pillow ]))
+  #  chromium
+  #  unclutter
+  #	#(kodi.withPackages (kodiPkgs: with kodiPkgs; [
+  #	#	jellycon
+  #	#	pvr-iptvsimple
+  #	#	netflix
+  #	#	svtplay
+  #	#	youtube
+  #	#]))
+  #];
 
   # Autostart Kodi
   #services.xserver.enable = true;
