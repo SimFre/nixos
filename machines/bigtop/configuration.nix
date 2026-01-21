@@ -6,6 +6,7 @@
       ../../common/common.nix
       ../../common/desktop.nix
       ../../common/plasma6.nix
+      ./plymouth.nix
     ];
 
   boot = {
@@ -43,6 +44,15 @@
   system = {
     stateVersion = "25.05";
   };
+
+
+  environment.systemPackages = with pkgs; [
+    obsidian
+    alsa-utils
+    obs-studio
+    vlc
+    tigervnc
+  ];
 
 
 }
