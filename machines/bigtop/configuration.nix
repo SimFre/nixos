@@ -1,4 +1,5 @@
-{ config, lib, pkgs ? import <nixpkgs-unstable> {}, ... }:
+#{ config, lib, pkgs ? import <nixpkgs-unstable> {}, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports =
     [ 
@@ -26,7 +27,7 @@
       supportedFilesystems = [ "zfs" ];
     };
     supportedFilesystems = [ "zfs" ];
-    kernelPackages = pkgs.linuxPackages_zen;
+    #kernelPackages = pkgs.linuxPackages_zen;
   };
   zramSwap.enable = true;
 
