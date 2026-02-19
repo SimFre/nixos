@@ -51,6 +51,18 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver   # iHD VAAPI driver (most modern Intel)
+      vaapiIntel           # legacy i965 driver (older Intel)
+      libvdpau-va-gl       # VDPAU -> VAAPI bridge (sometimes useful)
+    ];
+  };
+
+
 }
 
 

@@ -1,18 +1,165 @@
 { config, lib, pkgs, ... }:
-let secrets = import ./secrets.nix;
-#let
-#  kodi-with-addons = pkgs.kodi-wayland.withPackages (kodiPkgs: with kodiPkgs; [
-#  #kodi-with-addons = pkgs.kodi-gbm.withPackages (kodiPkgs: with kodiPkgs; [
-#    inputstream-adaptive
-#    bluetooth-manager
-#    jellycon
-#    pvr-iptvsimple
-#    netflix
-#    svtplay
-#    youtube
-#  ]);
+let
+  secrets = import ./secrets.nix;
+  extvpnSubnet4 = "10.89.0.0/24";     # your stable Podman subnet
+  extvpnIfName  = "podman-extvpn";
+  lanSubnets4 = [ "192.168.0.0/16" "10.0.0.0/8" "172.16.0.0/12" ];
+  tailscaleSubnets4 = [ "100.64.0.0/10" ];
+
+  # IPv6: include your LAN ULA (if any) + Tailscale ULA (you already have fd7a:115c:a1e0::/48)
+  lanSubnets6 = [ "fd00::/8" "fe80::/10" ];
+  tailscaleSubnets6 = [ "fd7a:115c:a1e0::/48" ];
+
+  vpnTable = 51820;
+  pbrMark = "0x1";
 in
 {
+  # WireGuard interface. NixOS module supports allowedIPsAsRoutes + fwMark + table.
+  # https://mynixos.com/options/networking.wireguard.interfaces.%3Cname%3E)
+  # https://wiki.nixos.org/wiki/WireGuard
+  networking.wireguard.interfaces.wg-extvpn = {
+    ips = [
+      secrets.vpnAddress4
+      secrets.vpnAddress6
+    ];
+
+    #listenPort = 51820; # optional; can be omitted for client
+    privateKey = secrets.vpnPrivateKey;
+
+    # Don't let NixOS add AllowedIPs routes automatically to main table
+    # https://mynixos.com/options/networking.wireguard.interfaces.%3Cname%3E
+    allowedIPsAsRoutes = false;
+    peers = [
+      {
+        publicKey = secrets.vpnPublicKey;
+        endpoint  = secrets.vpnEndpoint;
+        allowedIPs = [ "0.0.0.0/0" "::/0" ];
+        persistentKeepalive = 25;
+      }
+    ];
+  };
+
+  # (Optional) give the route table a name in /etc/iproute2/rt_tables.d/
+  networking.iproute2.enable = true;
+  networking.iproute2.rttablesExtraConfig = ''
+    ${toString vpnTable} extvpn
+  '';
+
+  # Set up the Podman network
+  systemd.services.podman-network-extvpn = {
+    description = "Create podman network for external VPN with stable subnet";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "podman.service" "network-online.target" ];
+    wants = [ "podman.service" "network-online.target" ];
+
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.podman}/bin/podman network exists extvpn-net || \
+        ${pkgs.podman}/bin/podman network create \
+          --subnet ${extvpnSubnet4} \
+          --interface-name podman-extvpn \
+          extvpn-net
+    '';
+  };
+
+  # Create policy routes + rules once WG is up
+  systemd.services.extvpn-pbr = {
+    description = "Policy based routing: egress via WireGuard";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" "wireguard-wg-extvpn.service" ];
+    wants = [ "network-online.target" "wireguard-wg-extvpn.service" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+
+    script = ''
+      set -euo pipefail
+      # Default route in the VPN routing table goes via wg-extvpn
+      ${pkgs.iproute2}/bin/ip route replace default dev wg-extvpn table ${toString vpnTable}
+      ${pkgs.iproute2}/bin/ip -6 route replace default dev wg-extvpn table ${toString vpnTable}
+
+      # Packets with mark 0x1 use the VPN table
+      # Make rule idempotent: delete if exists, then add.
+      ${pkgs.iproute2}/bin/ip rule del fwmark ${pbrMark} lookup ${toString vpnTable} priority 1000 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip rule add fwmark ${pbrMark} lookup ${toString vpnTable} priority 1000
+      ${pkgs.iproute2}/bin/ip -6 rule del fwmark ${pbrMark} lookup ${toString vpnTable} priority 1000 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip -6 rule add fwmark ${pbrMark} lookup ${toString vpnTable} priority 1000
+    '';
+
+    preStop = ''
+      # Clean up (safe even if not present)
+      ${pkgs.iproute2}/bin/ip rule del fwmark ${pbrMark} lookup ${toString vpnTable} priority 1000 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip -6 rule del fwmark ${pbrMark} lookup ${toString vpnTable} priority 1000 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip route del default dev wg-extvpn table ${toString vpnTable} 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip -6 route del default dev wg-extvpn table ${toString vpnTable} 2>/dev/null || true
+    '';
+  };
+
+  # nftables rules:
+  # - mark traffic arriving from podman-extvpn interface
+  # - EXCEPT if destination is LAN or Tailscale
+  # - NAT marked traffic out wg-extvpn
+  # nftables can match iifname/oifname and set meta mark.
+  # https://wiki.nftables.org/wiki-nftables/index.php/Matching_packet_metainformation
+  networking.nftables.enable = true;
+  networking.nftables.ruleset = ''
+    table inet extvpn_pbr {
+      set lan4 {
+        type ipv4_addr;
+        flags interval;
+        elements = { ${lib.concatStringsSep ", " lanSubnets4} }
+      }
+      set ts4 {
+        type ipv4_addr;
+        flags interval;
+        elements = { ${lib.concatStringsSep ", " tailscaleSubnets4} }
+      }
+      set pod4 {
+        type ipv4_addr;
+        flags interval;
+        elements = { ${extvpnSubnet4} }
+      }
+
+      set lan6 {
+        type ipv6_addr;
+        flags interval;
+        elements = { ${lib.concatStringsSep ", " lanSubnets6} }
+      }
+      set ts6 {
+        type ipv6_addr;
+        flags interval;
+        elements = { ${lib.concatStringsSep ", " tailscaleSubnets6} }
+      }
+
+      chain prerouting {
+        type filter hook prerouting priority mangle; policy accept;
+
+        # Only consider packets coming from the extvpn bridge
+        meta iifname "${extvpnIfName}" ip daddr @lan4 return
+        meta iifname "${extvpnIfName}" ip daddr @ts4  return
+	meta iifname "${extvpnIfName}" ip daddr @pod4 return
+        meta iifname "${extvpnIfName}" ip6 daddr @lan6 return
+        meta iifname "${extvpnIfName}" ip6 daddr @ts6  return
+        meta iifname "${extvpnIfName}" meta mark set ${pbrMark}
+      }
+
+      chain forward {
+        type filter hook forward priority filter; policy accept;
+        # Kill-switch: if it's marked VPN traffic but not going to wg-extvpn, drop it (prevents leaks).
+        meta mark ${pbrMark} meta oifname != "wg-extvpn" drop
+      }
+
+      chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+
+        # NAT only marked traffic out of the WG interface
+        meta mark ${pbrMark} meta oifname "wg-extvpn" masquerade
+      }
+    }
+  '';
+
   imports = [
     ./hardware-configuration.nix
     ./plymouth.nix
@@ -80,9 +227,14 @@ in
   users.users.htpc = {
     description = "HTPC";
     isNormalUser = true;
-    extraGroups = [ "video" "audio" "input" "networkmanager" ];
+    extraGroups = [ "video" "render" "audio" "input" "networkmanager" ];
     linger = true;
   };
+
+  environment.systemPackages = with pkgs; [
+     libva-utils
+     intel-gpu-tools
+  ];
 
   # Enable Kodi
   #services.kodi.enable = true;
@@ -219,7 +371,7 @@ in
     script = ''
       if [ ! -f /home/htpc/.ssh/id_ecdsa ]; then
         mkdir -p /home/htpc/.ssh
-        ssh-keygen -t ecdsa -N "" -f /home/htpc/.ssh/id_ecdsa
+        ${pkgs.openssh}/bin/ssh-keygen -t ecdsa -N "" -f /home/htpc/.ssh/id_ecdsa
         chown -R htpc:users /home/htpc/.ssh
         chmod 700 /home/htpc/.ssh
       fi
@@ -258,8 +410,39 @@ in
         ];
         # restart = "always";
       };
+      containers.dispatcharr = {
+        volumes = [
+          "/var/lib/dispatcharr:/data"
+        ];
+        environment = {
+	  DISPATCHARR_ENV = "aio";
+	  REDIS_HOST = "localhost";
+          CELERY_BROKER_URL = "redis://localhost:6379/0";
+	  DISPATCHARR_LOG_LEVEL = "info";
+	  LIBVA_DRIVER_NAME = "iHD";
+        };
+        ports = [
+          "9191:9191/tcp"
+        ];
+	#devices = {
+	#  "/dev/dri/renderD128": "/dev/dri/renderD128"
+	#  "/dev/kfd": "/dev/kfd"
+	#};
+        image = "ghcr.io/dispatcharr/dispatcharr:latest"; # Warning: if the tag does not change, the image will not be updated
+        extraOptions = [
+          #"--network=host"
+	  "--network=extvpn-net"
+	  "--device=/dev/dri:/dev/dri"
+	  "--group-add=render"
+	  "--group-add=video"
+          #"--device=/dev/ttyACM0:/dev/ttyACM0"  # Example, change this to match your own hardware
+        ];
+        # restart = "always";
+      };
     };
   };
+  systemd.services."podman-dispatcharr".after = [ "podman-network-extvpn.service" "extvpn-pbr.service" ];
+  systemd.services."podman-dispatcharr".wants = [ "podman-network-extvpn.service" "extvpn-pbr.service" ];
 
   #home = {
   #  username = "htpc";
