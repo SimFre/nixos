@@ -4,7 +4,7 @@
     package = pkgs.ollama-cuda;
     enable = true;
     #acceleration = "cuda";
-    host = "[::]";
+    host = "0.0.0.0";
     port = 11434;
   };
   services = {
