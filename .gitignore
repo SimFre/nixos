@@ -1,1 +1,3 @@
 result
+logs/
+secrets.nix
