@@ -32,9 +32,9 @@
     font = "Lat2-Terminus16";
     keyMap = "sv-latin1";
   };
-  users = {
-    defaultUserShell = pkgs.zsh;
-  };
+  #users = {
+  #  defaultUserShell = pkgs.zsh;
+  #};
   security = {
     sudo = {
       wheelNeedsPassword = false;
@@ -102,21 +102,21 @@
       viAlias = true;
       vimAlias = true;
     };
-    zsh = {
-      enable = true;
-      promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
-      syntaxHighlighting = {
-        enable = true;
-      };
-      histSize = 10000;
+    #zsh = {
+      #enable = true;
+      #promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
+      #syntaxHighlighting = {
+      #  enable = true;
+      #};
+      #histSize = 10000;
       #history = {
       #  size = 10000;
       #  share = true;
       #};
-      enableLsColors = true;
-      enableCompletion = true;
+      #enableLsColors = true;
+      #enableCompletion = true;
       #autosuggestion.enable = true;
-    };
+    #};
     fzf = {
       #enable = true;
       keybindings = true;

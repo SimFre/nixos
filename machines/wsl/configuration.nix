@@ -13,10 +13,14 @@
     <nixos-wsl/modules>
    ../../common/common.nix
   ];
+  networking = {
+    hostName = "wsl";
+  };
   environment = {
     systemPackages = with pkgs; [
       wslu
       socat
+      nodejs_24
     ];
   };
   wsl = {
@@ -24,6 +28,7 @@
     defaultUser = "simfre";
   };
   programs.nix-ld.enable = true;
+  services.openssh.ports = [ 22 9022 ];
   system.stateVersion = "24.11";
 
 }
