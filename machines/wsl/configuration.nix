@@ -20,7 +20,7 @@
     systemPackages = with pkgs; [
       wslu
       socat
-      nodejs_24
+      nodejs_22
     ];
   };
   wsl = {
