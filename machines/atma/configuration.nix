@@ -41,6 +41,11 @@
     networkmanager = {
       enable = true;
     };
+    firewall = { 
+      enable = true;
+      allowedTCPPorts = [ 22 11434 8080 ];
+    };
+
   };
   security.rtkit.enable = true;
   powerManagement = {
@@ -148,5 +153,11 @@
     #  defaultNetwork.settings.dns_enabled = true;
     #};
   };
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    # Add any missing dynamic libraries for unpackaged programs
+    # here, NOT in environment.systemPackages
+  ];
+  hardware.usb-modeswitch.enable = true;
 
 }
