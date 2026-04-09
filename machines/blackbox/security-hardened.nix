@@ -42,7 +42,7 @@ EOF
     network.ssh = {
       enable = true;
       port = 2222;
-      authorizedKeys = [ "ssh-ed25519 AAAAC3...admin" ];
+      authorizedKeys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLo+YygGuShRdm6fsOJmESqwfMecX7Kr+zJFNMk6rZI" ];
       hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
       shell = "/bin/zfs-unlock-menu";
     };
@@ -71,20 +71,6 @@ EOF
   # Disable local TTYs entirely
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@".enable = false;
-
-  # --- 3. ACTIVE DEFENSE (Panic Script) ---
-  services.acpid.enable = true;
-  systemd.services.chassis-panic = {
-    description = "Emergency ZFS Key Unload";
-    serviceConfig.Type = "oneshot";
-    script = ''
-      ${pkgs.zfs}/bin/zfs unmount -f -a
-      ${pkgs.zfs}/bin/zfs unload-key -a
-      sync; echo 3 > /proc/sys/vm/drop_caches
-      ${pkgs.systemd}/bin/poweroff
-      # FIXME: add sysrq shutdown if possible
-    '';
-  };
 
   # Adjust 'event' based on 'acpi_listen' output for your specific machine
   services.acpid.handlers.chassis_open = {

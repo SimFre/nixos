@@ -1,3 +1,6 @@
+
+{ config, lib, pkgs, ... }:
+
 # 1. Enable the ACPI daemon to listen for hardware events
 services.acpid.enable = true;
 
@@ -19,7 +22,10 @@ systemd.services.chassis-panic = {
       sync; echo 3 > /proc/sys/vm/drop_caches
       
       # Shut down the machine to prevent Cold Boot attacks
-      ${pkgs.systemd}/bin/poweroff
+      # ${pkgs.systemd}/bin/poweroff
+      # FIXME: add sysrq shutdown if possible
+      # If poweroff fails, try a hard shutdown via sysrq
+      echo o > /proc/sysrq-trigger
     '';
   };
 };

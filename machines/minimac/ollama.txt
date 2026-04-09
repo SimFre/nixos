@@ -1,0 +1,35 @@
+
+launchctl setenv OLLAMA_HOST "0.0.0.0"
+launchctl setenv OLLAMA_ORIGINS "*"
+mkdir -p ~/Library/LaunchAgents
+cat <<EOT >~/Library/LaunchAgents/com.ollama.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><!-- Root element added -->
+<dict>
+    <key>Label</key>
+    <string>com.ollama.plist</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/simfre/.nix-profile/bin/ollama</string> <!-- Adjust this path if your Nix installation puts 'ollama' elsewhere (check 'which ollama') -->
+        <string>serve</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>OLLAMA_HOST</key>
+        <string>0.0.0.0</string>
+        <key>OLLAMA_ORIGINS</key>
+        <string>*</string>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/simfre/.nix-profile/bin</string> <!-- Ensure the path to Ollama is included here -->
+    </dict>
+</dict>
+</plist>
+EOT
+
+launchctl load ~/Library/LaunchAgents/com.ollama.plist
+

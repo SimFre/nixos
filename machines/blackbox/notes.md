@@ -3,6 +3,48 @@
 
 # The "In the Wild" To-Do List
 
+## Create TPM keys
+
+On a clean machine, run;
+```bash
+nix-shell -p sbctl
+# Create a directory for your new Secure Boot PKI
+mkdir -p ~/my-secure-boot-keys
+cd ~/my-secure-boot-keys
+
+# Generate the keys (this creates PK, KEK, and db keys)
+sbctl create-keys
+
+This will generate a set of files in /var/lib/sbctl (by default). You want to copy the entire folder to your secure USB drive.
+
+Move: /var/lib/sbctl/* → USB_DRIVE/secureboot/
+
+Now, plug the USB into your target "In the Wild" appliance.
+
+Step 1: Move keys to the system
+NixOS's Lanzaboote module expects the keys to live in /etc/secureboot by default.
+Bash
+
+sudo mkdir -p /etc/secureboot
+sudo cp -r /run/media/user/USB/secureboot/* /etc/secureboot/
+sudo chmod 700 /etc/secureboot
+
+Step 2: Enter Setup Mode
+Reboot your Lenovo/Dell and enter the BIOS. Look for Secure Boot settings and select "Reset to Setup Mode" or "Delete Platform Key". This puts the hardware in a state where it's "begging" for a new owner.
+
+Step 3: Enroll the keys
+Back in NixOS on the target machine:
+Bash
+
+# Verify the machine is in Setup Mode
+sbctl status
+
+# Enroll the keys you brought over on the USB
+sudo sbctl enroll-keys --microsoft
+
+
+```
+
 ## Phase 1: Hardware Preparation
 
  - [ ] Update BIOS/firmware to enable TPM 2.0

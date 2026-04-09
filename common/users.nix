@@ -29,7 +29,7 @@
         hashedPassword = "$y$j9T$jmMv6ZMHjYgb5PQGTGpMC1$zRH291CADo7bpBU/QFKc054x2YI0G4HM.CsfqffmDL/";
         isNormalUser = true;
 	description = "SimFre";
-        extraGroups = [ "wheel" "networkmanager" ];
+        extraGroups = [ "wheel" "video" "render" "audio" "input" "networkmanager" ];
         openssh = {
           authorizedKeys = {
             keys = [
