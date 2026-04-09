@@ -3,16 +3,16 @@
 {
   # --- 1. BOOT & ENCRYPTION ---
   boot.loader.systemd-boot.enable = lib.mkForce false; 
-  boot.lanzaboote = {
-    enable = true;
-    pkiBundle = "/etc/secureboot";
-  };
+  # boot.lanzaboote = {
+  #  enable = true;
+  #  pkiBundle = "/etc/secureboot";
+  # };
 
   boot.initrd = {
     systemd.enable = true;
     supportedFilesystems = [ "zfs" ];
     kernelModules = [ "iwlwifi" ]; # Drivers for Intel WiFi
-    packages = [ pkgs.wpa_supplicant pkgs.tor pkgs.curl ];
+    # packages = [ pkgs.wpa_supplicant pkgs.tor pkgs.curl ];
     secrets."/etc/wpa_supplicant/wpa_supplicant.conf" = ./secrets/wifi.conf;
 
     # Include necessary tools in the RAM disk
@@ -73,16 +73,16 @@ EOF
   systemd.services."autovt@".enable = false;
 
   # Adjust 'event' based on 'acpi_listen' output for your specific machine
-  services.acpid.handlers.chassis_open = {
-    event = "button/lid.*"; 
-    action = "systemctl start chassis-panic.service";
-  };
+  #services.acpid.handlers.chassis_open = {
+  #  event = "button/lid.*"; 
+  #  action = "systemctl start chassis-panic.service";
+  #};
 
   # --- 4. USBGUARD ---
-  services.usbguard = {
-    enable = true;
-    defaultPolicy = "block"; 
-    # Allow only your specific Yubikey or Maintenance Keyboard if desired
-    # rules = "allow id 1050:0407"; 
-  };
+  #services.usbguard = {
+  #  enable = true;
+  #  defaultPolicy = "block"; 
+  #  # Allow only your specific Yubikey or Maintenance Keyboard if desired
+  #  # rules = "allow id 1050:0407"; 
+  #};
 }

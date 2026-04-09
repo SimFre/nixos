@@ -1,6 +1,6 @@
 
-{ config, lib, pkgs, ... }:
-
+{ pkgs, ... }:
+{
 # 1. Enable the ACPI daemon to listen for hardware events
 services.acpid.enable = true;
 
@@ -37,3 +37,5 @@ services.acpid.handlers = {
     action = "systemctl start chassis-panic.service";
   };
 };
+
+}

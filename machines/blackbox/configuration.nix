@@ -26,7 +26,6 @@
   networking.hostName = "blackbox";
   networking.hostId = "bb4412aa"; # Required for ZFS
   networking.firewall.enable = false;
-  time.timeZone = "Europe/Amsterdam";
   security.rtkit.enable = true;
   powerManagement.enable = true;
 
