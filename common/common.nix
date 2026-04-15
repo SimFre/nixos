@@ -43,14 +43,14 @@
   environment = {
     systemPackages = with pkgs; [
       # Utilities
-      fzf-zsh
+      # fzf-zsh
       git
       jq
       killall
       lsof
       mc
       mkpasswd
-      neofetch
+      fastfetch
       neovim
       nh
       oh-my-posh
