@@ -1,17 +1,25 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
+
+let
+  # Define the unstable channel
+  unstableTarball = fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  # Import it
+  unstable = import unstableTarball { config = config.nixpkgs.config; };
+in
 {
   services.ollama = {
-    package = pkgs.ollama-cuda;
+    #package = pkgs.ollama-cuda;
+    package = unstable.ollama-cuda;
     enable = true;
     #acceleration = "cuda";
     host = "0.0.0.0";
     port = 11434;
   };
-  services = {
-    open-webui = {
-      enable = true;
-    };
-  };
+  #services = {
+  #  open-webui = {
+  #    enable = true;
+  #  };
+  #};
 }
 
 #{ pkgs, ... }:

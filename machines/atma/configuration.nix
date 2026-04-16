@@ -107,12 +107,12 @@
     # podman-compose # start group of containers for dev
 
     binutils
-    docker-compose
-    nvidia-docker
-    nvidia-container-toolkit
-    libnvidia-container
+    # docker-compose
+    # nvidia-docker
+    # nvidia-container-toolkit
+    # libnvidia-container
     tigervnc
-
+    natron
   ];
 
   #hardware.graphics = { enable = true; };
@@ -136,28 +136,28 @@
   #Or autostart:
   #virsh net-autostart default
 
-  virtualisation.containers.enable = true;
-  virtualisation = {
-    docker = {
-      enable = true;
-      storageDriver = "zfs";
-      daemon.settings.features.cdi = true;
-    };
-    #podman = {
-    #  enable = true;
-
-    #  # Create a `docker` alias for podman, to use it as a drop-in replacement
-    #  dockerCompat = true;
-
-    #  # Required for containers under podman-compose to be able to talk to each other.
-    #  defaultNetwork.settings.dns_enabled = true;
-    #};
-  };
+  #virtualisation.containers.enable = true;
+  #virtualisation = {
+  #  docker = {
+  #    enable = true;
+  #    storageDriver = "zfs";
+  #    daemon.settings.features.cdi = true;
+  #  };
+  #  #podman = {
+  #  #  enable = true;
+  #
+  #  #  # Create a `docker` alias for podman, to use it as a drop-in replacement
+  #  #  dockerCompat = true;
+  #
+  #  #  # Required for containers under podman-compose to be able to talk to each other.
+  #  #  defaultNetwork.settings.dns_enabled = true;
+  #  #};
+  #};
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     # Add any missing dynamic libraries for unpackaged programs
     # here, NOT in environment.systemPackages
   ];
-  hardware.usb-modeswitch.enable = true;
+  # hardware.usb-modeswitch.enable = true;
 
 }
