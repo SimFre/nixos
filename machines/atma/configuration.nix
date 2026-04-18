@@ -56,6 +56,7 @@
   };
 
   services = {
+    smartd.enable = true;
     tailscale = {
       enable = true;
       authKeyParameters.baseURL = "https://vpn.lan2k.org/";
