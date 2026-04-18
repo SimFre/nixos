@@ -1,9 +1,12 @@
-{
-  config,
-  lib,
-  pkgs ? import <nixpkgs-unstable> { },
-  ...
-}:
+{ config, lib, pkgs, ... }:
+
+let
+  # Define the unstable channel
+  unstableTarball = fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  # Import it
+  unstable = import unstableTarball { config = config.nixpkgs.config; };
+in
+
 {
   imports = [
     ./hardware-configuration.nix
@@ -113,7 +116,7 @@
     # nvidia-container-toolkit
     # libnvidia-container
     tigervnc
-    natron
+    unstable.vscode.fhs
   ];
 
   #hardware.graphics = { enable = true; };
