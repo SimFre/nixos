@@ -6,6 +6,7 @@
       brave
       discord
       owncloud-client
+      libgnome-keyring # req for oC client
       spotify
       ghostty
       kitty

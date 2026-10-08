@@ -53,17 +53,17 @@
       fastfetch
       neovim
       nh
-      oh-my-posh
+      # oh-my-posh
       pv
       screen
       sops
       unrar
       unzip
       zip
-      zsh
-      zsh-fzf-history-search
-      zsh-fzf-tab
-      zsh-powerlevel10k
+      # zsh
+      # zsh-fzf-history-search
+      # zsh-fzf-tab
+      # zsh-powerlevel10k
 
       # System monitoring
       btop
@@ -103,26 +103,26 @@
       vimAlias = true;
     };
     #zsh = {
-      #enable = true;
-      #promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
-      #syntaxHighlighting = {
-      #  enable = true;
-      #};
-      #histSize = 10000;
-      #history = {
-      #  size = 10000;
-      #  share = true;
-      #};
-      #enableLsColors = true;
-      #enableCompletion = true;
-      #autosuggestion.enable = true;
+    #  enable = true;
+    #  promptInit = "eval \"$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/blue-owl.omp.json')\"";
+    #  syntaxHighlighting = {
+    #    enable = true;
+    #  };
+    #  histSize = 10000;
+    #  #history = {
+    #  #  size = 10000;
+    #  #  share = true;
+    #  #};
+    #  enableLsColors = true;
+    #  enableCompletion = true;
+    #  #autosuggestion.enable = true;
     #};
-    fzf = {
-      #enable = true;
-      keybindings = true;
-      fuzzyCompletion = true;
-      #enableZshIntegration = true;
-    };
+    #fzf = {
+    #  #enable = true;
+    #  keybindings = true;
+    #  fuzzyCompletion = true;
+    #  #enableZshIntegration = true;
+    #};
     #nh = {
     #  enable = true;
     #  clean = {
