@@ -53,5 +53,6 @@
     cura-appimage
   ];
 
+  services.octoprint.enable = true;
 
 }
