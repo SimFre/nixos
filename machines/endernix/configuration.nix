@@ -53,6 +53,15 @@
     cura-appimage
   ];
 
-  services.octoprint.enable = true;
+  services.octoprint = {
+    enable = true;
+    user = "laban";
+    port = 5000;
+    openFirewall = true;
+  };
+
+  services.tailscale = {
+    enable = true;
+  };
 
 }
