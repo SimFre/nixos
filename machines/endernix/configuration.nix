@@ -8,6 +8,7 @@
       ../../common/desktop.nix
       ../../common/plasma6.nix
       ./plymouth.nix
+      ./klipper.nix
     ];
 
   boot = {
@@ -48,17 +49,19 @@
 
 
   environment.systemPackages = with pkgs; [
-    octoprint
-    prusa-slicer
-    cura-appimage
+    # octoprint
+    # python314Packages.pip
+    # prusa-slicer
+    # cura-appimage
+    orca-slicer
   ];
 
-  services.octoprint = {
-    enable = true;
-    user = "laban";
-    port = 5000;
-    openFirewall = true;
-  };
+  #services.octoprint = {
+  #  enable = true;
+  #  user = "laban";
+  #  port = 5000;
+  #  openFirewall = true;
+  #};
 
   services.tailscale = {
     enable = true;

@@ -2,6 +2,7 @@
 {
   #imports = [ ./users.nix ./stylix.nix ];
   imports = [ ./users.nix ];
+  boot.zfs.forceImportRoot = false;
   time = {
     timeZone = "Europe/Stockholm";
   };

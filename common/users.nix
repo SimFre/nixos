@@ -17,7 +17,7 @@
         hashedPassword = "$y$j9T$jmMv6ZMHjYgb5PQGTGpMC1$zRH291CADo7bpBU/QFKc054x2YI0G4HM.CsfqffmDL/";
         isNormalUser = true;
         description = "Simon Fredriksson";
-        extraGroups = [ "wheel" "networkmanager" ];
+        extraGroups = [ "wheel" "networkmanager" "dialout" "video" "render" "audio" "input" ];
         openssh = {
           authorizedKeys = {
             keys = [
@@ -31,7 +31,7 @@
         hashedPassword = "$y$j9T$jmMv6ZMHjYgb5PQGTGpMC1$zRH291CADo7bpBU/QFKc054x2YI0G4HM.CsfqffmDL/";
         isNormalUser = true;
         description = "SimFre";
-        extraGroups = [ "wheel" "video" "render" "audio" "input" "networkmanager" ];
+        extraGroups = [ "wheel" "networkmanager" "dialout" "video" "render" "audio" "input" ];
         openssh = {
           authorizedKeys = {
             keys = [

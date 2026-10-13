@@ -13,7 +13,7 @@
       keepassxc
       libreoffice-fresh
       vscode.fhs
-      nixfmt-rfc-style
+      nixfmt
 
     ];
   };
